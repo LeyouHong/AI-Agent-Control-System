@@ -3,12 +3,9 @@ import os
 from pathlib import Path
 import pickle, base64
 from typing import Any, Optional, Sequence
-from app.code_agent.model.chat_gpt_model import llm_gpt
-from app.code_agent.tools.file_tools import file_toolskit
 
 from langgraph.checkpoint.base import BaseCheckpointSaver, ChannelVersions, Checkpoint, CheckpointMetadata, CheckpointTuple
 from langchain_core.runnables import RunnableConfig
-from langgraph.prebuilt import create_react_agent
 
 from app.common import FILE_DIR
 
@@ -79,6 +76,64 @@ class FileSaver(BaseCheckpointSaver[str]):
             )
         else:
             return None
+
+    async def aget_tuple(self, config: RunnableConfig) -> CheckpointTuple | None:
+        """Asynchronously fetch a checkpoint tuple using the given configuration.
+
+        Args:
+            config: Configuration specifying which checkpoint to retrieve.
+
+        Returns:
+            The requested checkpoint tuple, or `None` if not found.
+
+        Raises:
+            NotImplementedError: Implement this method in your custom checkpoint saver.
+        """
+
+        return self.get_tuple(config)
+
+    async def aput(
+        self,
+        config: RunnableConfig,
+        checkpoint: Checkpoint,
+        metadata: CheckpointMetadata,
+        new_versions: ChannelVersions,
+    ) -> RunnableConfig:
+        """Asynchronously store a checkpoint with its configuration and metadata.
+
+        Args:
+            config: Configuration for the checkpoint.
+            checkpoint: The checkpoint to store.
+            metadata: Additional metadata for the checkpoint.
+            new_versions: New channel versions as of this write.
+
+        Returns:
+            RunnableConfig: Updated configuration after storing the checkpoint.
+
+        Raises:
+            NotImplementedError: Implement this method in your custom checkpoint saver.
+        """
+        return self.put(config, checkpoint, metadata, new_versions)
+
+    async def aput_writes(
+        self,
+        config: RunnableConfig,
+        writes: Sequence[tuple[str, Any]],
+        task_id: str,
+        task_path: str = "",
+    ) -> None:
+        """Asynchronously store intermediate writes linked to a checkpoint.
+
+        Args:
+            config: Configuration of the related checkpoint.
+            writes: List of writes to store.
+            task_id: Identifier for the task creating the writes.
+            task_path: Path of the task creating the writes.
+
+        Raises:
+            NotImplementedError: Implement this method in your custom checkpoint saver.
+        """
+        return self.put_writes(config, writes, task_id, task_path)
     
     def put(
             self,
@@ -143,25 +198,3 @@ class FileSaver(BaseCheckpointSaver[str]):
         Raises:
             NotImplementedError: Implement this method in your custom checkpoint saver.
         """
-        print("put_writes")
-
-if __name__ == "__main__":
-    saver = FileSaver()
-    config = RunnableConfig(configurable={"thread_id": 2})
-
-    agent = create_react_agent(
-        model=llm_gpt, 
-        tools=file_toolskit, 
-        checkpointer=saver,
-    )
-
-    while True:
-        user_input = input("User: ")
-        if user_input.lower() == "exit" or user_input.lower() == "quit":
-            break
-        resp = agent.invoke(input={"messages": [
-            ("user", user_input)
-        ]}, config=config)
-
-        print("AI: ", resp["messages"][-1].content)
-        print()
