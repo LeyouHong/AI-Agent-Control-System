@@ -8,7 +8,7 @@ from langchain_core.runnables import RunnableConfig
 from app.code_agent.tools.file_saver import FileSaver
 from app.code_agent.model.chat_gpt_model import llm_gpt
 from app.code_agent.tools.file_tools import file_toolskit
-from app.code_agent.tools.shell_tools import get_stdio_shell_tools
+from app.code_agent.tools.terminal_tools import get_stdio_terminal_tools
 
 def format_debug_output(step_name: str, content: str, is_tool_call = False) -> None:
     if is_tool_call:
@@ -25,8 +25,8 @@ def format_debug_output(step_name: str, content: str, is_tool_call = False) -> N
 async def run_agent():
     saver = FileSaver()
 
-    shell_tools = await get_stdio_shell_tools()
-    tools = file_toolskit + shell_tools
+    terminal_tools = await get_stdio_terminal_tools()
+    tools = file_toolskit + terminal_tools
 
     config = RunnableConfig(configurable={"thread_id": 3})
 
