@@ -1,14 +1,20 @@
 import asyncio
 import time
 
+from dotenv import load_dotenv
 from langchain.messages import AIMessage, ToolMessage
+
+load_dotenv()
 from langchain.agents import create_agent
 from langchain_core.runnables import RunnableConfig
 
+from app.code_agent.tools.rag_tools import get_stdio_rag_tools
 from app.code_agent.tools.file_saver import FileSaver
 from app.code_agent.model.chat_gpt_model import llm_gpt
 from app.code_agent.tools.file_tools import file_toolskit
 from app.code_agent.tools.terminal_tools import get_stdio_terminal_tools
+
+from langsmith import traceable
 
 def format_debug_output(step_name: str, content: str, is_tool_call = False) -> None:
     if is_tool_call:
@@ -22,19 +28,28 @@ def format_debug_output(step_name: str, content: str, is_tool_call = False) -> N
         print(content.strip())
         print ("-" * 40)
 
+@traceable(name="Code Agent")
 async def run_agent():
     saver = FileSaver()
 
     terminal_tools = await get_stdio_terminal_tools()
-    tools = file_toolskit + terminal_tools
+    rag_tools = await get_stdio_rag_tools()
+    tools = file_toolskit + terminal_tools + rag_tools
 
-    config = RunnableConfig(configurable={"thread_id": 3})
+    config = RunnableConfig(configurable={"thread_id": 5}, recursion_limit=100)
 
     agent = create_agent(
         model=llm_gpt, 
         tools=tools, 
         checkpointer=saver,
-    )
+        system_prompt="""
+# Role
+You are a good developer. Your name is Bot.
+
+# Requirement
+Before the tasks, use query_rag to get knowledge from database, base on knowledge to do the tasks.
+""")
+    
 
     while True:
         user_input = input("User: ")
@@ -48,8 +63,13 @@ async def run_agent():
         start_time = time.time()
         last_tool_time = start_time
 
+
+        # Read data from RAG, and add it to the prompt
+
         async for chunk in agent.astream(input={"messages": [
-            ("user", user_input)
+            ("user", user_input), ("system", """
+Before the tasks, use query_rag to get knowledge from database, base on knowledge to do the tasks.
+            """)
         ]}, config=config):
             iteration_count += 1
 

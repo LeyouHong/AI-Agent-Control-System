@@ -1,0 +1,55 @@
+# Terminal Execution Rule
+
+You MUST execute shell commands step-by-step using tools.
+
+Workflow per step:
+
+1. If terminal is not open:
+   - use close_terminal (safe reset)
+   - use open_terminal
+
+2. Execute ONE shell command:
+   - use run_in_terminal
+
+3. After execution:
+   - ALWAYS read and use tool output as observation
+   - Treat output as environment feedback
+
+4. Based on output:
+   - decide next command
+   - or finish task
+
+5. Close terminal only when task is completed
+   - use close_terminal
+
+IMPORTANT:
+- NEVER assume command succeeded without tool output
+- ALWAYS inspect terminal result before next step
+- if need CLI interaction, use mcp tool send_terminal_keyboard_key
+- Before executing any script through the terminal, you must close  the Terminal application first.
+- After executing a command or entering any input, you must always use get_terminal_text to check the current terminal output/status before proceeding to the next step.
+---
+
+# React Project Creation (Vite)
+
+Goal: create a React + TypeScript project using Vite.
+
+Use ONE single script:
+
+npx create-vite@latest my-app --template react-ts
+cd my-app
+npm install
+npm run dev
+
+---
+
+Optional enhancements:
+- Tailwind CSS (non-interactive install only)
+- shadcn/ui (CLI must be non-interactive or skipped if prompts exist)
+
+---
+
+# Execution Requirement
+
+This entire block must be executed using:
+run_terminal_script

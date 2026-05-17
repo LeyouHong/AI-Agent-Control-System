@@ -2,11 +2,13 @@ import shlex
 import subprocess
 from typing import Annotated
 
+from langsmith import traceable
 from mcp.server.fastmcp import FastMCP
 from pydantic.fields import Field
 
 mcp = FastMCP()
 
+@traceable(run_type="tool", name="Run Shell Command")
 @mcp.tool(name="run_shell", description="Run a shell command")
 def run_shell_command(command: 
                       Annotated[str, Field(description="shell command will be executed", 
