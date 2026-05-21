@@ -1,12 +1,17 @@
 import asyncio
+import sys
 import time
+from pathlib import Path
+
+# Allow running this file directly: python app/code_agent/agent/code_agent.py
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from dotenv import load_dotenv
+
 from langchain.messages import AIMessage, ToolMessage
 
-from app.code_agent.prompt.system_prompt import build_system_prompt
-
-load_dotenv()
 from langchain.agents import create_agent
 from langchain_core.runnables import RunnableConfig
 
@@ -15,8 +20,12 @@ from app.code_agent.tools.file_saver import FileSaver
 from app.code_agent.model.chat_gpt_model import llm_gpt
 from app.code_agent.tools.file_tools import file_toolskit
 from app.code_agent.tools.terminal_tools import get_stdio_terminal_tools
+from app.code_agent.tools.browser_tools import get_stdio_browser_tools
+from app.code_agent.prompt.system_prompt import build_system_prompt
 
 from langsmith import traceable
+
+load_dotenv()
 
 def format_debug_output(step_name: str, content: str, is_tool_call = False) -> None:
     if is_tool_call:
@@ -36,7 +45,8 @@ async def run_agent():
 
     terminal_tools = await get_stdio_terminal_tools()
     rag_tools = await get_stdio_rag_tools()
-    tools = file_toolskit + terminal_tools + rag_tools
+    browser_tools = await get_stdio_browser_tools()
+    tools = file_toolskit + terminal_tools + rag_tools + browser_tools
 
     config = RunnableConfig(configurable={"thread_id": 5}, recursion_limit=100)
 

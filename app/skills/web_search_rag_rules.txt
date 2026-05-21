@@ -1,0 +1,31 @@
+# Web Search RAG Rules
+
+## Purpose
+This document outlines the guidelines and best practices for conducting web searches to gather information efficiently and effectively.
+
+### 1. Define Clear Objectives
+- Identify the specific information needed before conducting a search.
+- Frame questions clearly to guide the search process.
+
+### 2. Use Specific Keywords
+- Utilize targeted keywords relevant to the query.
+- Include variations of phrases and terms for broader results.
+
+### 3. Evaluate Sources
+- Prioritize reputable and authoritative sources (e.g., educational institutions, government sites, major news outlets).
+- Cross-reference information from multiple sources to ensure accuracy.
+
+### 4. Summarize Findings
+- After gathering information, summarize key points and relevant data succinctly.
+- Highlight sources for each piece of information to maintain credibility.
+
+### 5. Stay Updated
+- Regularly check for the latest information, as facts can change over time.
+- Use alerts or subscriptions to stay informed about specific topics.
+
+### 6. Ethical Considerations
+- Respect copyright and intellectual property rights when using information.
+- Properly attribute or link back to original sources when sharing findings.
+
+### Conclusion
+Following these rules will enhance the effectiveness of web searches and improve the quality of information gathered.
