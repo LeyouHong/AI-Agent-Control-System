@@ -1,7 +1,20 @@
+import os
+
 from langchain_community.agent_toolkits import FileManagementToolkit
+from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# =========================
+# 1. LLM 定义
+# =========================
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    api_key=os.environ["OPENAI_API_KEY"],
+    streaming=True,
+)
 
 # =========================
 # 2. Tool 定义
