@@ -124,27 +124,30 @@ Features:
 
 # System Architecture
 
-```text
-User Request
-      ↓
-LLM Planner
-      ↓
-Tool Selection
-      ↓
-Execution Layer
- ┌───────────────┐
- │ Terminal Tool │
- │ Browser Tool  │
- │ File Tool     │
- │ Memory Tool   │
- └───────────────┘
-      ↓
-Result Analysis
-      ↓
-Next-Step Planning
-      ↓
-Final Response
+## Workflow Diagram
+
+```mermaid
+flowchart TD
+    A[User Request] --> B[LLM Planner]
+    B --> C[Tool Selection]
+    C --> D[Execution Layer]
+    D --> E[Result Analysis]
+    E --> F[Next-Step Planning]
+    F --> |task complete| G[Final Response]
+    F --> |continue| B
+
+    subgraph Tools[Execution Layer]
+        T1[Terminal Tool]
+        T2[Browser Tool]
+        T3[File Tool]
+        T4[Memory Tool]
+    end
+
+    D --> Tools
+    Tools --> E
 ```
+
+The agent workflow follows a continuous planning-execution-feedback loop:
 
 ---
 
@@ -190,6 +193,17 @@ This prevents unsafe operations outside the allowed workspace.
 - combine browser + terminal execution
 - retrieve contextual knowledge
 - automate development workflows
+
+## Workflow
+
+```mermaid
+flowchart LR
+    A[Clone Repo] --> B[Install Deps]
+    B --> C[Run Dev Server]
+    C --> D[Detect Errors]
+    D --> E[Debug & Fix]
+    E --> F[Verify Build]
+```
 
 ---
 
